@@ -6,7 +6,7 @@ let stompClient = null;
 const API_URL = process.env.REACT_APP_API_URL;
 
 const connectWebSocket = ( callback ) => {
-    const socket = new SockJS(`http://${API_URL}/ws`);
+    const socket = new SockJS(`${API_URL}/ws`);
     stompClient = Stomp.over(socket);
   
     stompClient.connect({}, () => {
