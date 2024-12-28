@@ -13,10 +13,11 @@ const MessageInput = ({ onSend }) => {
   };
 
   return (
-    <div className="message-input">
+    <div class="input-group p-2 border-top">
       <input
         type="text"
         placeholder="Type your name"
+        className='form-control border-secondary'
         value={user}
         onChange={(e) => setUser(e.target.value)}
       />
@@ -24,10 +25,12 @@ const MessageInput = ({ onSend }) => {
         type="text"
         placeholder="Type your message..."
         value={input}
+        className='form-control border-secondary'
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleSend()}
       />
-      <button onClick={handleSend}>Send</button>
+      <button onClick={handleSend}
+        className='btn btn-primary'>Send</button>
     </div>
   );
 };

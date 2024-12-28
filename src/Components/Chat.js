@@ -3,6 +3,7 @@ import { connectWebSocket, sendMessage, deleteAllMessages } from '../Services/we
 import { getAllMessages } from '../Services/api.js';
 import MessageList from './MessageList.js';
 import MessageInput from './MessageInput.js';
+import Header from './Header.js';
 
 const Chat = () => {
   
@@ -34,8 +35,9 @@ const Chat = () => {
   };
 
   return (
-    <div className="chat-container">
-      <MessageList messages={messages} clearChat={clearChat}/>
+    <div className="container d-flex flex-column mx-auto chat-container">
+      <Header clearChat={clearChat}/>
+      <MessageList messages={messages} />
       <MessageInput onSend={handleSendMessage} />
     </div>
   );

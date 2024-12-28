@@ -1,14 +1,13 @@
 import React from 'react';
 
-const MessageList = ({ messages, clearChat }) => {
+const MessageList = ({ messages }) => {
 
   return (
-    <div className="message-list">
-      <button onClick={clearChat}>Clear chat</button>
+    <div className="flex-grow-1 p-2 border message-list">
       {
         messages.map((mssg, index) => (
-          <div key={index} className="message">
-            <strong>{mssg.sender}</strong>: {mssg.content} <small>({new Date(mssg.timestamp).toLocaleTimeString()})</small>
+          <div key={index} className="mb-2">
+            <strong className="text-primary">{mssg.sender}</strong>: {mssg.content} <small>({new Date(mssg.timestamp).toLocaleTimeString()})</small>
           </div>
         ))
       }
