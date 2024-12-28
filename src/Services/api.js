@@ -12,3 +12,14 @@ export const getAllMessages = async () => {
     return [];
   }
 };
+
+export const deleteAllMessages = async () => {
+  try {
+    console.log(API_URL);
+    const response = await axios.get(`${API_URL}/deleteAllMessages`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting all messages:', error);
+    return [];
+  }
+};

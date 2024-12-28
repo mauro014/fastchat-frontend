@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connectWebSocket, sendMessage } from '../Services/websocket.js';
-import { getAllMessages } from '../Services/api.js';
+import { getAllMessages, deleteAllMessages } from '../Services/api.js';
 import MessageList from './MessageList.js';
 import MessageInput from './MessageInput.js';
 
@@ -27,9 +27,14 @@ const Chat = () => {
     sendMessage(message);
   };
 
+  const clearChat = () => {
+    deleteAllMessages();
+    setMessages([]);
+  };
+
   return (
     <div className="chat-container">
-      <MessageList messages={messages} />
+      <MessageList messages={messages} clearChat={clearChat}/>
       <MessageInput onSend={handleSendMessage} />
     </div>
   );

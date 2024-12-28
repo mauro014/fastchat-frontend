@@ -1,8 +1,10 @@
 import React from 'react';
 
-const MessageList = ({ messages }) => {
+const MessageList = ({ messages, clearChat }) => {
+
   return (
     <div className="message-list">
+      <button onClick={clearChat}>Clear chat</button>
       {
         messages.map((mssg, index) => (
           <div key={index} className="message">
