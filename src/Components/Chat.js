@@ -14,8 +14,7 @@ const Chat = () => {
     getAllMessages().then((allMessages) => setMessages(allMessages));
 
     connectWebSocket(
-      (newMessage) => { 
-        setMessages((prevMessages) => [...prevMessages, newMessage]); }
+          (newMessage) => { setMessages((prevMessages) => [...prevMessages, newMessage]); }
         , () => setMessages([])
     );
 

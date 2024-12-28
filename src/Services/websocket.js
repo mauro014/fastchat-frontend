@@ -9,18 +9,21 @@ const connectWebSocket = ( onMessageCallback, onClearCallback ) => {
     const socket = new SockJS(`${API_URL}/ws`);
     stompClient = Stomp.over(socket);
   
-    stompClient.connect({}, () => {
-      console.log('Connected to WebSocket');
-      stompClient.subscribe('/topic/messages', (message) => {
+    stompClient.connect(
+      {}, 
+      () => {
+        console.log('Connected to WebSocket');
+        stompClient.subscribe('/topic/messages', (message) => {
 
-        if (message.body === 'CLEAR') {
-          onClearCallback(); 
-        } else {
-          onMessageCallback(JSON.parse(message.body));
-        }
-        
-      });
-    });
+          if (message.body === 'CLEAR') {
+            onClearCallback(); 
+          } else {
+            onMessageCallback(JSON.parse(message.body));
+          }
+          
+        });
+      }
+    );
   };
   
   const sendMessage = (message) => {

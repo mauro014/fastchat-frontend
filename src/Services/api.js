@@ -9,6 +9,10 @@ export const getAllMessages = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching previous messages:', error);
-    return [];
+    return [{
+      "sender": "ERROR", 
+      "content": String(error),
+      "timestamp": new Date().toISOString()
+    }];
   }
 };
