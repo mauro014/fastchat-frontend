@@ -5,15 +5,20 @@ let stompClient = null;
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-const connectWebSocket = ( callback ) => {
+const connectWebSocket = ( onMessageCallback, onClearCallback ) => {
     const socket = new SockJS(`${API_URL}/ws`);
     stompClient = Stomp.over(socket);
   
     stompClient.connect({}, () => {
       console.log('Connected to WebSocket');
       stompClient.subscribe('/topic/messages', (message) => {
-        const parsedMessage = JSON.parse(message.body);
-        callback(parsedMessage);
+
+        if (message.body === 'CLEAR') {
+          onClearCallback(); 
+        } else {
+          onMessageCallback(JSON.parse(message.body));
+        }
+        
       });
     });
   };
@@ -25,5 +30,13 @@ const connectWebSocket = ( callback ) => {
       console.error('WebSocket is not connected.');
     }
   };
+
+  const deleteAllMessages = () => {
+    if (stompClient && stompClient.connected) {
+      stompClient.send('/app/deleteAllMessages');
+    } else {
+      console.error('WebSocket is not connected.');
+    }
+  };
   
-  export { connectWebSocket, sendMessage };
+  export { connectWebSocket, sendMessage, deleteAllMessages };

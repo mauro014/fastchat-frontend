@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { connectWebSocket, sendMessage } from '../Services/websocket.js';
-import { getAllMessages, deleteAllMessages } from '../Services/api.js';
+import { connectWebSocket, sendMessage, deleteAllMessages } from '../Services/websocket.js';
+import { getAllMessages } from '../Services/api.js';
 import MessageList from './MessageList.js';
 import MessageInput from './MessageInput.js';
 
@@ -12,9 +12,11 @@ const Chat = () => {
 
     getAllMessages().then((allMessages) => setMessages(allMessages));
 
-    connectWebSocket((newMessage) => {
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-    });
+    connectWebSocket(
+      (newMessage) => { 
+        setMessages((prevMessages) => [...prevMessages, newMessage]); }
+        , () => setMessages([])
+    );
 
   }, []);
 
@@ -29,7 +31,6 @@ const Chat = () => {
 
   const clearChat = () => {
     deleteAllMessages();
-    setMessages([]);
   };
 
   return (
