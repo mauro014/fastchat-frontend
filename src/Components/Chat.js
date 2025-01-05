@@ -34,7 +34,6 @@ const Chat = () => {
 
     const lastMessage = document.querySelector(".message-list .message:last-child");
     if (lastMessage) {
-      console.log("messageList");
       lastMessage.scrollIntoView({ behavior: "smooth" });
     }
 

@@ -5,3 +5,7 @@
 .message-list{
   height: 100vh;
 }
+.message-list::after {
+  position: absolute;
+  height: calc(100% - 60px);
+}
