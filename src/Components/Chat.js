@@ -11,14 +11,38 @@ const Chat = () => {
 
   useEffect(() => {
 
-    getAllMessages().then((allMessages) => setMessages(allMessages));
+    const fetchMessages = async () => {
+      try {
+        const fetchedMessages = await getAllMessages();
+        setMessages(fetchedMessages);
+      } catch (err) {
+        addNewMessageOnView( createErrorMessage('Failed to load messages.') );
+      }
+    };
+
+    fetchMessages();
 
     connectWebSocket(
-          (newMessage) => { setMessages((prevMessages) => [...prevMessages, newMessage]); }
+          (newMessage) => addNewMessageOnView(newMessage) 
         , () => setMessages([])
+        , (errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) )
     );
 
   }, []);
+
+  
+
+  const createErrorMessage = (messageContent) => {
+    return {
+      sender: "System Error", 
+      content: messageContent + " - Please try again later.",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  const addNewMessageOnView = (newMessage) => {
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+  }
 
   const handleSendMessage = (content, user) => {
     const message = {
@@ -26,11 +50,16 @@ const Chat = () => {
       content,
       timestamp: new Date().toISOString(),
     };
-    sendMessage(message);
+    sendMessage(
+      message, 
+      (errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) )
+    );
   };
 
   const clearChat = () => {
-    deleteAllMessages();
+    deleteAllMessages(
+      (errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) )
+    );
   };
 
   return (

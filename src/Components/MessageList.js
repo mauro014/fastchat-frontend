@@ -7,7 +7,7 @@ const MessageList = ({ messages }) => {
       {
         messages.map((mssg, index) => (
           <div key={index} className="mb-2">
-            <strong className={ mssg.sender === 'ERROR' ? "text-danger" : "text-primary"}>{mssg.sender}</strong>: {mssg.content} <small>({new Date(mssg.timestamp).toLocaleTimeString()})</small>
+            <strong className={ mssg.sender === 'System Error' ? "text-danger" : "text-primary"}>{mssg.sender}</strong>: {mssg.content} <small>({new Date(mssg.timestamp).toLocaleString()})</small>
           </div>
         ))
       }
