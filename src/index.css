@@ -9,3 +9,31 @@
   position: absolute;
   height: calc(100% - 60px);
 }
+.username-prompt {
+  align-items: center;
+  justify-content: center;
+}
+.message {
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: #000;
+}
+.message-sent {
+  max-width: 75%;
+  background-color: #d1e1e7;
+  color: #000;
+  margin-left: auto;
+}
+.message-received {
+  max-width: 75%;
+  background-color: #FFFFFF;
+  color: #000;
+  margin-right: auto;
+}
+.message-error {
+  max-width: 100%;
+  background-color: #ebbec2;
+  color: #000;
+  margin-right: auto;
+}

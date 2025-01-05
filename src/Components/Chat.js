@@ -3,11 +3,13 @@ import { connectWebSocket, sendMessage, deleteAllMessages } from '../Services/we
 import { getAllMessages } from '../Services/api.js';
 import MessageList from './MessageList.js';
 import MessageInput from './MessageInput.js';
+import UsernamePrompt from './UsernamePrompt';
 import Header from './Header.js';
 
 const Chat = () => {
   
   const [messages, setMessages] = useState([]);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
 
@@ -20,7 +22,11 @@ const Chat = () => {
       }
     };
 
-    fetchMessages();
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+      fetchMessages();
+    }
 
     connectWebSocket(
           (newMessage) => addNewMessageOnView(newMessage) 
@@ -52,9 +58,9 @@ const Chat = () => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
   }
 
-  const handleSendMessage = (content, user) => {
+  const handleSendMessage = (content) => {
     const message = {
-      sender: user, 
+      sender: username, 
       content,
       timestamp: new Date().toISOString(),
     };
@@ -70,11 +76,30 @@ const Chat = () => {
     );
   };
 
+  const clearUsername = () => {
+    setUsername("");
+    localStorage.removeItem("username");
+  };
+
+  const handleUsernameSubmit = (name) => {
+    console.log("submit " + name);
+
+    localStorage.setItem('username', name);
+    setUsername(name);
+
+  };
+
+  if (!username) {
+    return (
+      <UsernamePrompt onSubmit={handleUsernameSubmit} />
+    );
+  }
+
   return (
     <div className="container d-flex flex-column mx-auto chat-container">
-      <Header clearChat={clearChat}/>
-      <MessageList messages={messages} />
-      <MessageInput onSend={handleSendMessage} />
+      <Header clearChat={clearChat} clearUsername={clearUsername} />
+      <MessageList messages={messages} userName={username} />
+      <MessageInput user={username} onSend={handleSendMessage} />
     </div>
   );
 };

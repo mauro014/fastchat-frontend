@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 
-const MessageInput = ({ onSend }) => {
+const MessageInput = ({ user, onSend }) => {
   
   const [input, setInput] = useState('');
-  const [user, setUser] = useState('');
 
   const handleSend = () => {
-    if (input.trim() && user.trim()) {
-      onSend(input, user);
+    if (input.trim()) {
+      onSend(input);
       setInput('');
     }
   };
@@ -16,10 +15,9 @@ const MessageInput = ({ onSend }) => {
     <div className="input-group p-2 border-top">
       <input
         type="text"
-        placeholder="Type your name"
-        className='form-control border-secondary'
+        className='form-control border-secondary readonly bg-secondary text-light'
+        style={{ pointerEvents: 'none' }}
         value={user}
-        onChange={(e) => setUser(e.target.value)}
       />
       <input
         type="text"
