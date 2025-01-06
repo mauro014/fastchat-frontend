@@ -82,8 +82,6 @@ const Chat = () => {
   };
 
   const handleUsernameSubmit = (name) => {
-    console.log("submit " + name);
-
     localStorage.setItem('username', name);
     setUsername(name);
 
