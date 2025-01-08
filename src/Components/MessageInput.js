@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const MessageInput = ({ user, onSend }) => {
+const MessageInput = ({ onSend }) => {
   
   const [input, setInput] = useState('');
 
@@ -12,13 +12,7 @@ const MessageInput = ({ user, onSend }) => {
   };
 
   return (
-    <div className="input-group p-2 border-top">
-      <input
-        type="text"
-        className='form-control border-secondary readonly bg-secondary text-light'
-        style={{ pointerEvents: 'none' }}
-        value={user}
-      />
+    <div className="input-group p-2 border-top bg-custom-blue">
       <input
         type="text"
         placeholder="Type your message..."
@@ -28,7 +22,7 @@ const MessageInput = ({ user, onSend }) => {
         onKeyDown={(e) => e.key === 'Enter' && handleSend()}
       />
       <button onClick={handleSend}
-        className='btn btn-primary'>Send</button>
+        className='btn btn-outline-light'>Send</button>
     </div>
   );
 };

@@ -1,13 +1,20 @@
 import React from 'react';
 
-const Header = ( { clearChat, clearUsername } ) => {
+const Header = ( { profile, logOut, clearChat } ) => {
     return (
-        <div className="d-flex align-items-center p-3  bg-primary">
-            <h1 className="m-0 text-white fw-bold">Fast Chat</h1>
-            <div className="btn-group ms-auto">
-                { clearChat != null ? (<button className="btn btn-outline-light ms-auto" onClick={clearChat} >Clear Chat</button>) : '' }
-                { clearUsername != null ? (<button className="btn btn-outline-light ms-auto" onClick={clearUsername} >Log out</button>) : '' }
-            </div>
+        <div className="d-flex align-items-center p-2 bg-custom-blue rounded-top shadow">
+            <img src={`${process.env.PUBLIC_URL}/img/fc_ame.png`} 
+                    alt="Fast Chat" 
+                    className="img-fluid" style={{height: "40px"}}/>
+            <button className="btn btn-link p-0 ms-auto" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src={profile.picture} alt="User" className="rounded-circle" width="40" height="40" referrerPolicy="no-referrer" />
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><p className="dropdown-item">{profile.name}</p></li>
+                <div className="dropdown-divider"></div>
+                { clearChat != null ? (<li><button className="dropdown-item" type="button" onClick={clearChat} >Clear Chat</button></li>) : '' }
+                <li><button className="dropdown-item" type="button" onClick={logOut} >Log out</button></li>
+            </ul>
         </div>
       );
 };

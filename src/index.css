@@ -1,3 +1,6 @@
+body{
+  background-color: #d3d3d3; 
+}
 .chat-container {
   max-width: 600px;
   height: 100vh;
@@ -36,4 +39,12 @@
   background-color: #ebbec2;
   color: #000;
   margin-right: auto;
+}
+
+.google-button{
+  border: none;
+}
+
+.bg-custom-blue{
+  background-color: #618AAE;
 }

@@ -3,13 +3,11 @@ import { connectWebSocket, sendMessage, deleteAllMessages } from '../Services/we
 import { getAllMessages } from '../Services/api.js';
 import MessageList from './MessageList.js';
 import MessageInput from './MessageInput.js';
-import UsernamePrompt from './UsernamePrompt';
 import Header from './Header.js';
 
-const Chat = () => {
+const Chat = ({ profile , logOut }) => {
   
-  const [messages, setMessages] = useState([]);
-  const [username, setUsername] = useState('');
+  const [messages, setMessages] = useState([]);  
 
   useEffect(() => {
 
@@ -22,9 +20,7 @@ const Chat = () => {
       }
     };
 
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      setUsername(storedUsername);
+    if (profile) {
       fetchMessages();
     }
 
@@ -44,7 +40,6 @@ const Chat = () => {
     }
 
   }, [messages]);
-  
 
   const createErrorMessage = (messageContent) => {
     return {
@@ -60,7 +55,7 @@ const Chat = () => {
 
   const handleSendMessage = (content) => {
     const message = {
-      sender: username, 
+      sender: profile.email, 
       content,
       timestamp: new Date().toISOString(),
     };
@@ -76,28 +71,11 @@ const Chat = () => {
     );
   };
 
-  const clearUsername = () => {
-    setUsername("");
-    localStorage.removeItem("username");
-  };
-
-  const handleUsernameSubmit = (name) => {
-    localStorage.setItem('username', name);
-    setUsername(name);
-
-  };
-
-  if (!username) {
-    return (
-      <UsernamePrompt onSubmit={handleUsernameSubmit} />
-    );
-  }
-
   return (
-    <div className="container d-flex flex-column mx-auto chat-container">
-      <Header clearChat={clearChat} clearUsername={clearUsername} />
-      <MessageList messages={messages} userName={username} />
-      <MessageInput user={username} onSend={handleSendMessage} />
+    <div className="container d-flex flex-column mx-auto chat-container m-3">
+      <Header clearChat={clearChat} profile={profile} logOut={logOut}/>
+      <MessageList messages={messages} userName={profile.email} />
+      <MessageInput onSend={handleSendMessage} />
     </div>
   );
 };

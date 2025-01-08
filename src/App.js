@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import Chat from './Components/Chat.js';
+import Login from './Components/Login.js';
 import { googleLogout, useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
+import { validateGoogleToken } from './Services/api.js';
 
 //https://muhammedsahad.medium.com/react-js-a-step-by-step-guide-to-google-authentication-926d0d85edbd
 function App() {
-    const [ user, setUser ] = useState([]);
-    const [ profile, setProfile ] = useState([]);
+    const [ profile, setProfile ] = useState(null);
 
     const login = useGoogleLogin({
-        onSuccess: (codeResponse) => {
-            setUser(codeResponse);
-            console.log(codeResponse);
-            const token = codeResponse.credential;
+        onSuccess: async (codeResponse) => {
+            const token = codeResponse.access_token;
+
             console.log(token);
+
+            try {
+                const backendResponse = await validateGoogleToken(token);
+                setProfile(backendResponse);                
+                sessionStorage.setItem('userProfile', JSON.stringify(backendResponse));
+            } catch (err) {
+                console.log(err)
+            }
         },
         onError: (error) => console.log('Login Failed:', error)
     });
@@ -21,47 +28,27 @@ function App() {
     const logOut = () => {
         googleLogout();
         setProfile(null);
+        sessionStorage.setItem('userProfile', null);
     };
 
     useEffect(
         () => {
-            if (user) {
-                axios
-                    .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-                        headers: {
-                            Authorization: `Bearer ${user.access_token}`,
-                            Accept: 'application/json'
-                        }
-                    })
-                    .then((res) => {
-                        setProfile(res.data);
-                    })
-                    .catch((err) => console.log(err));
-            }
+            const savedUserProfile = sessionStorage.getItem('userProfile');
+            if (savedUserProfile && savedUserProfile !== "undefined") {
+                setProfile(JSON.parse(savedUserProfile));
+              }
         },
-        [ user ]
+        [ ]
     );
 
     return (
         <div>
-            <h2>React Google Login</h2>
-            <br />
-            <br />
             {profile ? (
-                <div>
-                    <div>
-                        <img src={profile.picture} alt="user image" />
-                        <h3>User Logged in</h3>
-                        <p>Name: {profile.name}</p>
-                        <p>Email Address: {profile.email}</p>
-                        <br />
-                        <br />
-                        <button onClick={logOut}>Log out</button>
-                    </div>
-                    <Chat />
-                </div>
+                    <Chat profile={profile} logOut={logOut} />
             ) : (
-                <button onClick={() => login()}>Sign in with Google 🚀 </button>
+                <>
+                    <Login onClick={() => login()} />
+                </>
             )}
         </div>
     )
