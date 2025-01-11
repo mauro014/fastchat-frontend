@@ -12,7 +12,7 @@ const MessageInput = ({ onSend }) => {
   };
 
   return (
-    <div className="input-group p-2 border-top bg-custom-blue">
+    <div className="fixed-bottom-height bg-custom-blue input-group p-2 rounded-bottom-3 rounded-start-0">
       <input
         type="text"
         placeholder="Type your message..."

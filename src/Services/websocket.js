@@ -7,7 +7,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 //https://stomp-js.github.io/api-docs/latest/classes/Stomp.html
 //https://stomp-js.github.io/api-docs/latest/classes/CompatClient.html
-const connectWebSocket = ( onMessageCallback, onClearCallback, onErrorCallback ) => {
+const connectWebSocket = ( onMessageCallback, onNewChatCallback, onClearCallback, onErrorCallback, userEmail ) => {
 
     stompClient = Stomp.over(function(){
       return new SockJS(`${API_URL}/ws`)
@@ -24,7 +24,7 @@ const connectWebSocket = ( onMessageCallback, onClearCallback, onErrorCallback )
     stompClient.connect(
       {}, 
       () => {
-        console.log('Connected to WebSocket');
+
         stompClient.subscribe('/topic/messages', (message) => {
 
           if (message.body === 'CLEAR') {
@@ -34,6 +34,12 @@ const connectWebSocket = ( onMessageCallback, onClearCallback, onErrorCallback )
           }
           
         });
+
+        stompClient.subscribe(`/topic/chat/${userEmail}`, (chat) => {
+          const body = JSON.parse(chat.body);
+          onNewChatCallback(body)
+        });
+        
       }
     );
   };
@@ -41,6 +47,14 @@ const connectWebSocket = ( onMessageCallback, onClearCallback, onErrorCallback )
   const sendMessage = (message, onErrorCallback) => {
     if (stompClient && stompClient.connected) {
       stompClient.send('/app/sendMessage', {}, JSON.stringify(message));
+    } else {
+      onErrorCallback("WebSocket is not connected.");
+    }
+  };
+
+  const sendNotificationNewChat = (chatId, onErrorCallback) => {
+    if (stompClient && stompClient.connected) {
+      stompClient.send('/app/newChat', {}, chatId);
     } else {
       onErrorCallback("WebSocket is not connected.");
     }
@@ -54,4 +68,4 @@ const connectWebSocket = ( onMessageCallback, onClearCallback, onErrorCallback )
     }
   };
   
-  export { connectWebSocket, sendMessage, deleteAllMessages };
+  export { connectWebSocket, sendMessage, deleteAllMessages, sendNotificationNewChat };

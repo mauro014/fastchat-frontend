@@ -3,7 +3,7 @@ import React from 'react';
 const MessageList = ({ messages, userName }) => {
 
   return (
-    <div className="flex-grow-1 p-2 message-list overflow-auto shadow bg-white">
+    <div className="message-list overflow-auto bg-light p-2 flex-grow-1">
       {
         messages.map((mssg, index) => (
           <div key={index} className={`mb-2 message ${mssg.sender === userName ? 'message-sent' : mssg.sender === 'System Error' ? 'message-error' : 'message-received'}`}>
