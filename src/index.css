@@ -72,16 +72,12 @@ body{
 
 .main-container {
   max-width: 1000px;
-  margin: 10px auto; /* Center the container horizontally and add margin around */
-  /*border-radius: 15px;  Rounded corners */
-  /*box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); Subtle shadow */
-  overflow: hidden; /* Prevent content from spilling outside the container */
-  /*box-sizing: border-box; /* Include padding/border in total width/height */
+  margin: 10px auto;
+  overflow: hidden;
   padding: 0px;
-  height: calc(100vh - 20px); /* Full viewport height minus top and bottom margins */
+  height: calc(100vh - 20px);
 }
 
-/* Flex container to take full height of the viewport */
 .d-flex {
   display: flex;
   height: 100%;
@@ -92,4 +88,12 @@ body{
   align-items: center;
   border-bottom: 1px solid #ddd;
   padding: 10px 15px;
+}
+
+.list-item-box-selected {
+  background-color: #ddd;
+}
+
+.text-darkblue{
+  color: #618AAE;
 }

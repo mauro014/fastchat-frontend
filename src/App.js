@@ -12,8 +12,6 @@ function App() {
         onSuccess: async (codeResponse) => {
             const token = codeResponse.access_token;
 
-            console.log(token);
-
             try {
                 const backendResponse = await validateGoogleToken(token);
                 setProfile(backendResponse);                

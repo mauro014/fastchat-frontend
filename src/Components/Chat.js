@@ -1,51 +1,89 @@
 import React, { useState, useEffect } from 'react';
-import { connectWebSocket, sendMessage, deleteAllMessages, sendNotificationNewChat } from '../Services/websocket.js';
-import { getChatsByUser } from '../Services/api.js';
+import { connectWebSocket, subscribe2Chat, updateMessageSubscription } from '../Services/websocket.js';
+import { getChatById, getChatsByUser, getMessagesByChatId } from '../Services/api.js';
 import MessageList from './MessageList.js';
 import ChatList from './ChatList.js';
 import MessageInput from './MessageInput.js';
 import Header from './Header.js';
 import CreateChat from './CreateChat.js';
+import CurrentChatHeader from './CurrentChatHeader.js';
 
 const Chat = ({ profile , logOut }) => {
   
   const [messages, setMessages] = useState([]);  
-  const [chats, setChats] = useState([]);  
+  const [chats, setChats] = useState(new Map());  
+  const [currentChat, setCurrentChat] = useState(null);  
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-
-    // const fetchMessages = async () => {
-    //   try {
-    //     const fetchedMessages = await getAllMessages();
-    //     setMessages(fetchedMessages);
-    //   } catch (err) {
-    //     addNewMessageOnView( createErrorMessage('Failed to load messages.') );
-    //   }
-    // };
 
     const fetchChats = async (email) => {
       try {
         const fetchedChats = await getChatsByUser(email);
-        setChats(fetchedChats);
+        if(fetchedChats){
+
+          const chatMap = fetchedChats.reduce((map, chat) => {
+            map.set(chat.id, chat);
+            return map;
+          }, new Map());
+          setChats(chatMap);
+
+          if(fetchedChats[0]){
+            showChatOnView(fetchedChats[0])
+          }
+        }
       } catch (err) {
         addNewMessageOnView( createErrorMessage('Failed to load chats.') );
       }
     };
-
-    if (profile) {
-      //fetchMessages();
-      fetchChats(profile.email);
-    }
-
-    connectWebSocket(
-          (newMessage) => addNewMessageOnView(newMessage) 
-        , (newChat) => setChats((prevChats) => [...prevChats, newChat])
-        , () => setMessages([])
-        , (errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) )
-        , profile.email
+    
+    const stompClient = connectWebSocket(
+      (errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) )
     );
 
+    stompClient.connect({}, 
+      () => {
+        setIsConnected( true );
+        fetchChats(profile.email); 
+
+        subscribe2Chat(profile.email,
+          (newChat) => {
+              setChats((prevChats) => {
+                const newChats = new Map(prevChats); 
+                newChats.set(newChat.id, newChat);
+                return newChats; 
+              });
+
+              showChatOnView(newChat);
+            },
+          (chat) => modifyChatNotification(chat, true)
+        );
+      });
+
   }, [profile]);
+
+  const loadChat = async (idChat) => {
+    await getChatById(idChat)
+    .then(chat => {
+      showChatOnView(chat);
+      modifyChatNotification(chat.id, false)
+    });
+  }
+
+  const showChatOnView = async (chat) => {
+
+    setCurrentChat(chat);
+    await getMessagesByChatId(chat.id)
+      .then(fetchedMessages => {
+
+        setMessages(fetchedMessages);
+        updateMessageSubscription(chat.id,
+          (newMessage) => addNewMessageOnView(newMessage) ,
+          (errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage)) 
+        );
+
+      });
+  }
 
   useEffect(() => {
 
@@ -64,60 +102,55 @@ const Chat = ({ profile , logOut }) => {
     };
   }
 
+  const modifyChatNotification = (id, value) => {
+
+    id = Number(id);
+
+    setChats((prevChats) => {
+
+      const newChats = new Map(prevChats); 
+      const chatToModify = newChats.get(id); 
+
+      if (chatToModify) {
+        chatToModify.newMessages = value;
+      }
+
+      return newChats; 
+    });
+  };
+
   const addNewMessageOnView = (newMessage) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
   }
 
-  const handleSendMessage = (content) => {
-    const message = {
-      sender: profile.email, 
-      content,
-      timestamp: new Date().toISOString(),
-    };
-    sendMessage(
-      message, 
-      (errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) )
-    );
-  };
-
-  const handleChatCreated = ( response ) => {
-
-    let idChat = response.data.id;
-
-    if(idChat){
-        sendNotificationNewChat(
-          idChat , 
-          () => { console.log("Error"); } );
-    }
-
-  }
-
-  const clearChat = () => {
-    deleteAllMessages(
-      (errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) )
-    );
-  };
-
   return (
-    <>
-      <div className="main-container shadow">
-        <div className="d-flex">
-          <div className="left-column d-flex flex-column border-end">
-            <div className="fixed-top-height">
-              <Header clearChat={clearChat} profile={profile} logOut={logOut}/>
-            </div>
-            <ChatList chats={chats} userEmail={profile.email} />
-            <CreateChat profile={profile} handleChatCreated={(response) => handleChatCreated(response) } />
+    <div className="main-container shadow">
+      <div className="d-flex">
+        <div className="left-column d-flex flex-column border-end">
+          <div className="fixed-top-height">
+            <Header profile={profile} logOut={logOut}/>
           </div>
-          <div className="right-column d-flex flex-column flex-grow-1">
-            <div className="fixed-top-height bg-custom-blue text-white">Right Header</div>
+          <ChatList 
+            chats={chats} 
+            userEmail={profile.email} 
+            onClick={(idChat) => loadChat(idChat)}
+            currentChat={currentChat} />
+          <CreateChat profile={profile} />
+        </div>
+        <div className="right-column d-flex flex-column flex-grow-1">
+          <div className="fixed-top-height bg-custom-blue text-white flex-column">
+            <CurrentChatHeader currentChat={currentChat} profile={profile} />
+          </div>            
+          <div className="message-list overflow-auto bg-light p-2 flex-grow-1">
             <MessageList messages={messages} userName={profile.email} />
-            <MessageInput onSend={handleSendMessage} />
           </div>
+          <MessageInput 
+            profile={profile} 
+            handleError={(errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) ) }
+            chat={currentChat} />
         </div>
       </div>
-
-  </>
+    </div>
   );
 };
 

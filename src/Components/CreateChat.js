@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { createNewChat } from '../Services/api.js';
+import { sendNotificationNewChat } from '../Services/websocket.js';
 
-const CreateChat = ({ profile, handleChatCreated }) => {
+const CreateChat = ({ profile }) => {
 
     const [email, setEmail] = useState("");
     const [showModal, setShowModal] = useState(false);
@@ -13,6 +14,17 @@ const CreateChat = ({ profile, handleChatCreated }) => {
         setResponseMessage("");
     };
 
+    const handleChatCreated = ( response ) => {
+
+        let idChat = response.data.id;
+    
+        if(idChat){
+            sendNotificationNewChat(
+              idChat , 
+              () => { console.log("Error"); } );
+        }
+    }
+
     //https://dev.to/bolouie/how-do-you-check-for-valid-email-input-3b3j
     const isValidEmail = (email) => {
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -20,6 +32,7 @@ const CreateChat = ({ profile, handleChatCreated }) => {
     }
 
     const handleCreateChat = () => {
+        setEmail(email.toLocaleLowerCase())
         if(!isValidEmail(email)){
             setResponseMessage("Invalid email format");
             return;
