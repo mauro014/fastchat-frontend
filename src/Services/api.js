@@ -5,6 +5,9 @@ const API_URL = process.env.REACT_APP_API_URL;
 export const getChatsByUser = async (email) => {
   const response = await axios.get(`${API_URL}/chatsByUser/${email}`, {
     withCredentials: true,
+    headers: {
+      "Content-Type": "application/json",
+    }
   });
   return response.data;
 };
