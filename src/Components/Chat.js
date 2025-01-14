@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getStompClient, subscribe2Chat, updateMessageSubscription } from '../Services/websocket.js';
 import { getChatById, getChatsByUser, getMessagesByChatId } from '../Services/api.js';
 import MessageList from './MessageList.js';
-import ChatList, { createChatMap, modifyChatNotification } from './ChatList.js';
+import ChatList, { createChatMap } from './ChatList.js';
 import MessageInput from './MessageInput.js';
 import Header from './Header.js';
 import CreateChat from './CreateChat.js';
@@ -51,17 +51,34 @@ const Chat = ({ profile , logOut }) => {
               });
               showChatOnView(newChat);
             },
-          (chat) => modifyChatNotification(chats, chat, true)
+          (chat) => modifyChatNotification(chat, true)
         );
       });
 
   }, [profile]);
 
+  const modifyChatNotification = (id, value) => {
+
+    id = Number(id);
+
+    setChats((prevChats) => {
+
+      const newChats = new Map(prevChats); 
+      const chatToModify = newChats.get(id); 
+
+      if (chatToModify) {
+        chatToModify.newMessages = value;
+      }
+
+      return newChats; 
+    });
+  };
+
   const loadChat = async (idChat) => {
     await getChatById(idChat)
     .then(chat => {
       showChatOnView(chat);
-      modifyChatNotification(chats, chat.id, false)
+      modifyChatNotification(chat.id, false)
     });
   }
 
