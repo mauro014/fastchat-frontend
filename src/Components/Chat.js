@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connectWebSocket, subscribe2Chat, updateMessageSubscription } from '../Services/websocket.js';
+import { getStompClient, subscribe2Chat, updateMessageSubscription } from '../Services/websocket.js';
 import { getChatById, getChatsByUser, getMessagesByChatId } from '../Services/api.js';
 import MessageList from './MessageList.js';
-import ChatList from './ChatList.js';
+import ChatList, { createChatMap, modifyChatNotification } from './ChatList.js';
 import MessageInput from './MessageInput.js';
 import Header from './Header.js';
 import CreateChat from './CreateChat.js';
@@ -13,7 +13,6 @@ const Chat = ({ profile , logOut }) => {
   const [messages, setMessages] = useState([]);  
   const [chats, setChats] = useState(new Map());  
   const [currentChat, setCurrentChat] = useState(null);  
-  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
 
@@ -22,11 +21,7 @@ const Chat = ({ profile , logOut }) => {
         const fetchedChats = await getChatsByUser(email);
         if(fetchedChats){
 
-          const chatMap = fetchedChats.reduce((map, chat) => {
-            map.set(chat.id, chat);
-            return map;
-          }, new Map());
-          setChats(chatMap);
+          setChats(createChatMap(fetchedChats));
 
           if(fetchedChats[0]){
             showChatOnView(fetchedChats[0])
@@ -37,13 +32,12 @@ const Chat = ({ profile , logOut }) => {
       }
     };
     
-    const stompClient = connectWebSocket(
+    const stompClient = getStompClient(
       (errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) )
     );
 
     stompClient.connect({}, 
       () => {
-        setIsConnected( true );
         fetchChats(profile.email); 
 
         subscribe2Chat(profile.email,
@@ -53,10 +47,9 @@ const Chat = ({ profile , logOut }) => {
                 newChats.set(newChat.id, newChat);
                 return newChats; 
               });
-
               showChatOnView(newChat);
             },
-          (chat) => modifyChatNotification(chat, true)
+          (chat) => modifyChatNotification(chats, chat, true)
         );
       });
 
@@ -66,7 +59,7 @@ const Chat = ({ profile , logOut }) => {
     await getChatById(idChat)
     .then(chat => {
       showChatOnView(chat);
-      modifyChatNotification(chat.id, false)
+      modifyChatNotification(chats, chat.id, false)
     });
   }
 
@@ -89,7 +82,7 @@ const Chat = ({ profile , logOut }) => {
 
     const lastMessage = document.querySelector(".message-list .message:last-child");
     if (lastMessage) {
-      lastMessage.scrollIntoView({ behavior: "smooth" });
+      lastMessage.scrollIntoView({ behavior: "instant" });
     }
 
   }, [messages]);
@@ -101,23 +94,6 @@ const Chat = ({ profile , logOut }) => {
       timestamp: new Date().toISOString(),
     };
   }
-
-  const modifyChatNotification = (id, value) => {
-
-    id = Number(id);
-
-    setChats((prevChats) => {
-
-      const newChats = new Map(prevChats); 
-      const chatToModify = newChats.get(id); 
-
-      if (chatToModify) {
-        chatToModify.newMessages = value;
-      }
-
-      return newChats; 
-    });
-  };
 
   const addNewMessageOnView = (newMessage) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -146,7 +122,7 @@ const Chat = ({ profile , logOut }) => {
           </div>
           <MessageInput 
             profile={profile} 
-            handleError={(errorMessage) =>  addNewMessageOnView( createErrorMessage(errorMessage) ) }
+            handleError={(errorMessage) => addNewMessageOnView( createErrorMessage(errorMessage) ) }
             chat={currentChat} />
         </div>
       </div>

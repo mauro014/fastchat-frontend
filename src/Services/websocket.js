@@ -8,7 +8,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 //https://stomp-js.github.io/api-docs/latest/classes/Stomp.html
 //https://stomp-js.github.io/api-docs/latest/classes/CompatClient.html
-const connectWebSocket = ( onErrorCallback ) => {
+const getStompClient = ( onErrorCallback ) => {
 
     stompClient = Stomp.over(function(){
       return new SockJS(`${API_URL}/ws`)
@@ -67,4 +67,4 @@ const connectWebSocket = ( onErrorCallback ) => {
     }
   };
   
-  export { connectWebSocket, sendNotificationNewChat, sendNotificationNewMessage , subscribe2Chat, updateMessageSubscription};
+  export { getStompClient, sendNotificationNewChat, sendNotificationNewMessage , subscribe2Chat, updateMessageSubscription};

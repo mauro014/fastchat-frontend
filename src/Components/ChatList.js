@@ -1,5 +1,27 @@
 import React from 'react';
 
+export const modifyChatNotification = (prevChats, id, value) => {
+
+  id = Number(id);
+
+  const newChats = new Map(prevChats); 
+  const chatToModify = newChats.get(id); 
+
+  if (chatToModify) {
+    chatToModify.newMessages = value;
+  }
+
+  return newChats;
+};
+
+export const createChatMap = (fetchedChats) => {
+  const chatMap = fetchedChats.reduce((map, chat) => {
+    map.set(chat.id, chat);
+    return map;
+  }, new Map());
+  return chatMap;
+}
+
 const ChatList = ({ chats, userEmail, onClick, currentChat }) => {
 
   return (
