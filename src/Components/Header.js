@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ( { profile, logOut } ) => {
+const Header = ( { profile, logOut, showAbout } ) => {
     return (
         <div className="d-flex fixed-top-height align-items-center p-2 bg-custom-blue rounded-top-3 rounded-end-0">
             <img src={`${process.env.PUBLIC_URL}/img/fc_ame.png`} 
@@ -13,6 +13,7 @@ const Header = ( { profile, logOut } ) => {
             <li><p className="dropdown-item">{profile.name}<br />
                 <small className="text-secondary">{profile.email}</small></p></li>
                 <div className="dropdown-divider"></div>
+                <li><button className="dropdown-item" type="button" onClick={showAbout} >About</button></li>
                 <li><button className="dropdown-item" type="button" onClick={logOut} >Log out</button></li>
             </ul>
         </div>

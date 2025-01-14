@@ -7,12 +7,14 @@ import MessageInput from './MessageInput.js';
 import Header from './Header.js';
 import CreateChat from './CreateChat.js';
 import CurrentChatHeader from './CurrentChatHeader.js';
+import Info from './Info.js';
 
 const Chat = ({ profile , logOut }) => {
   
   const [messages, setMessages] = useState([]);  
   const [chats, setChats] = useState(new Map());  
   const [currentChat, setCurrentChat] = useState(null);  
+  const [showAbout, setShowAbout] = useState(false);
 
   useEffect(() => {
 
@@ -104,7 +106,9 @@ const Chat = ({ profile , logOut }) => {
       <div className="d-flex">
         <div className="left-column d-flex flex-column border-end">
           <div className="fixed-top-height">
-            <Header profile={profile} logOut={logOut}/>
+            <Header 
+              profile={profile} logOut={logOut}
+              showAbout={() => setShowAbout(true)} />
           </div>
           <ChatList 
             chats={chats} 
@@ -126,6 +130,7 @@ const Chat = ({ profile , logOut }) => {
             chat={currentChat} />
         </div>
       </div>
+      <Info showAbout={showAbout} handleModalClose={() => setShowAbout(false)}/>
     </div>
   );
 };

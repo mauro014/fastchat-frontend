@@ -58,12 +58,8 @@ const CreateChat = ({ profile }) => {
         <div className="fixed-bottom-height bg-custom-blue p-2 rounded-bottom-3 rounded-end-0">
             <button className='btn btn-outline-light w-100 h-100' onClick={() => setShowModal(true)}>Create new chat</button>
         </div>
-        { showModal && (<div
-            className="modal show"
-            tabIndex="-1"
-            role="dialog"
-            style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        >
+        { showModal && (
+            <div className="modal show" tabIndex="-1" role="dialog" style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
             <div className="modal-dialog" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
