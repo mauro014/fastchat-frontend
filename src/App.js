@@ -7,18 +7,26 @@ import { validateGoogleToken } from './Services/api.js';
 //https://muhammedsahad.medium.com/react-js-a-step-by-step-guide-to-google-authentication-926d0d85edbd
 function App() {
     const [ profile, setProfile ] = useState(null);
+    const [ dangerMessage, setDangerMessage ] = useState("");
+    const [ loading, setLoading ] = useState(false);
 
     const login = useGoogleLogin({
         onSuccess: async (codeResponse) => {
             const token = codeResponse.access_token;
 
             try {
+                setLoading(true);
+                setDangerMessage("");
                 const backendResponse = await validateGoogleToken(token);
                 setProfile(backendResponse);                
                 sessionStorage.setItem('userProfile', JSON.stringify(backendResponse));
             } catch (err) {
-                console.log(err)
+                if(err.code === "ERR_NETWORK"){
+                    console.error("");
+                    setDangerMessage("Server is not reachable. Please try later.");
+                }
             }
+            setLoading(false);
         },
         onError: (error) => console.log('Login Failed:', error)
     });
@@ -45,7 +53,10 @@ function App() {
                     <Chat profile={profile} logOut={logOut} />
             ) : (
                 <>
-                    <Login onClick={() => login()} />
+                    <Login 
+                        onClick={() => login()} 
+                        dangerMessage={dangerMessage}
+                        loading={loading} />
                 </>
             )}
         </div>

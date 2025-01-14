@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Login = ( { onClick } ) => {
+const Login = ( { onClick , dangerMessage, loading } ) => {
     return (
         <div 
             className="container mx-auto m-5">
@@ -8,11 +8,21 @@ const Login = ( { onClick } ) => {
                 <img src={`${process.env.PUBLIC_URL}/img/FastChat.PNG`} 
                     alt="Fast Chat" 
                     className="img-fluid mb-5" />
-                <button className='google-button' onClick={() => onClick()}>
+                {loading ? (
+                    <div className="spinner-border" role="status">
+                        <span className="sr-only"></span>
+                    </div>
+                ):(
+                    <button className='google-button' onClick={() => onClick()}>
                     <img
                         src={`${process.env.PUBLIC_URL}/img/sign_in_google.png`}
                         alt="Sign in google" />
-                </button>
+                    </button>
+                )}
+                
+                {dangerMessage ?
+                 (<div class="alert alert-danger mt-2" role="alert">{dangerMessage}</div>) : ""
+                }
             </div>
         </div>
       );
